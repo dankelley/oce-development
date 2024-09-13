@@ -1,0 +1,9 @@
+accM,acceleration,m/s^2,
+PSAL,salinity,,
+t~90C,temperature,degree*C,IPTS-90
+t~90,temperature,degree*C,IPTS-90
+cond~mS/cm,conductivity,mS/cm,
+oxsatMg/L,oxygen,,
+density,density,kg/m^3,
+
+
