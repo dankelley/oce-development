@@ -66,4 +66,4 @@ oldNames <- names(d[["data"]])
 newNames <- renamerTest1(oldNames, "ioos.csv", debug=0)
 df <- data.frame(new=unname(sapply(newNames, \(x) x$name)), old=oldNames)
 df
-message("FIXME: Q values, OXYOCPVL01, IRRDUV01, CPHLPR01, AHSFZZ01, RecPerBin")
+message("FIXME: Q values, OXYOCPVL01, IRRDUV01, CPHLPR03, AHSFZZ01, RecPerBin")
