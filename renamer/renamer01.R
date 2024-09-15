@@ -5,15 +5,13 @@ library(oce)
 #    col.names = c("original", "oce", "unit", "scale")
 # )
 
-# The system is that ~ can represent a digit
-# vocab$pattern <- paste0("^", gsub("~", "[0-9]", vocab$original), "$")
-# if (debug > 0) print(vocab)
 
 #' Rename variables according to a specified dictionary
+#' The system is that ~ can represent a digit
 renamerTest1 <- function(names, dictionary = "sbe.csv", debug = 0) {
     debug <- min(3L, max(debug, 0L))
     if (is.character(dictionary) && grepl(".csv$", dictionary)) {
-        oceDebug(debug, "renamerTest1() reading dictionary file \"", dictionary, "\"\n", sep = "")
+        oceDebug(debug, "renamerTest1() reading dictionary in \"", dictionary, "\"\n", sep = "")
         vocab <- read.csv(dictionary,
             header = FALSE,
             col.names = c("original", "oce", "unit", "scale")
@@ -21,7 +19,6 @@ renamerTest1 <- function(names, dictionary = "sbe.csv", debug = 0) {
     }
     # The system is that ~ can represent a digit
     vocab$pattern <- paste0("^", gsub("~", "[0-9]", vocab$original), "$")
-    print(vocab$pattern)
     if (debug > 1) {
         print(vocab)
     }
@@ -31,8 +28,6 @@ renamerTest1 <- function(names, dictionary = "sbe.csv", debug = 0) {
         # Look up
         oceDebug(debug, "searching for an exact name match to \"", name, "\"\n")
         w <- which(name == vocab$original)
-        print(w)
-        print(vocab[w, ])
         if (length(w) == 0L) {
             oceDebug(debug, "no exact match, so searching patterns for a match\n")
             w <- which(sapply(vocab$pattern, \(pattern) grepl(pattern, name)))
@@ -47,18 +42,11 @@ renamerTest1 <- function(names, dictionary = "sbe.csv", debug = 0) {
             rval <- rbind(rval, c(originalName = name, oceName = name, unit = "", scale = ""))
         } else {
             oceDebug(debug, "\"", name, "\" matches vocabulary at index ", w, "\n", sep = "")
-            oceDebug(debug - 1, vectorShow(vocab[w, ]))
+            oceDebug(debug, vectorShow(vocab[w, ]))
             rval <- rbind(rval, c(
                 originalName = name,
                 oceName = vocab$oce[w], unit = vocab$unit[w], scale = vocab$scale[w]
             ))
-            # Leave this to later, so we can return a data frame here
-            # unit <- try(parse(text = vocab$unit[w]), silent = TRUE)
-            # rval[[i]] <- if (inherits(unit, "try-error")) {
-            #    list(name = vocab$oce[w], unit = vocab$unit[w], scale = vocab$scale[w])
-            # } else {
-            #    list(name = vocab$oce[w], unit = parse(text = vocab$unit[w]), scale = vocab$scale[w])
-            # }
         }
     }
     colnames(rval) <- c("originalName", "oceName", "unit", "scale")
@@ -66,7 +54,7 @@ renamerTest1 <- function(names, dictionary = "sbe.csv", debug = 0) {
 }
 
 # Test 1
-test <- renamerTest1(c("accM", "oxsatMg/L"), "sbe.csv", debug = 1)
+test <- renamerTest1(c("accM", "oxsatMg/L"), "sbe.csv")
 stopifnot(all.equal(test$oceName, c("acceleration", "oxygen")))
 
 d <- read.netcdf("CTD_CAR2023011_001_496780_DN.ODF.nc")
@@ -75,6 +63,7 @@ R <- renamerTest1(oldNames, "ioos.csv", debug = 0)
 newNames <- R$oceNames
 df <- data.frame(new = R$oceName, old = R$originalName, check = oldNames)
 stopifnot(all.equal(df$old, df$check))
-print(df[, 1:2])
+print(df[, c("old", "new")])
 
 message("NEXT: test multiple files, ideally freshly downloaded)")
+message("NEXT: how to align flags with items? (wrt to e.g. salinity2) (also some names wrong)")
