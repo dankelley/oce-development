@@ -1,0 +1,26 @@
+# https://cfconventions.org/Data/cf-standard-names/78/build/cf-standard-name-table.html
+AltimeterSensor,altimeterCalibration,,
+PAR_BiosphericalLicorChelseaSensor,PAR_BiosphericalLicorChelseaCalibration,,
+FluoroWetlabECO_AFL_FL_Sensor,FluoroWetlabECO_AFL_FL_Calibration,,
+xSensor,xCalibration,,
+xSensor,xCalibration,,
+ScanNumber,scan,,
+CNDCST~~,conductivity,S/m,
+CNTR_~~,counter,,
+CRAT_~~,conductivityRatio,,
+ConductivitySensor,conductivityCalibration,,
+DOXYZZ~~,oxygen,,
+OxygenSensor,oxygenCalibration,,
+PRESPR~~,pressure,dbar,
+PSALST~~,salinity,,PSS-78
+PSLTZZ~~,salinity,,PSS-78
+PressureSensor,pressureCalibration,,
+SIGTEQST~~,sigmaTheta,kg/m^3,
+SIGTEQ~~,sigmaTheta,kg/m^3,
+TEMPP901,temperature,degree*C,ITS-90
+TEMPPR~~,temperature,degree*C,
+TEMPS901,temperature,degree*C,ITS-90
+TemperatureSensor,temperatureCalibration,,
+latitude,latitude,degree*N,
+longitude,longitude,degree*E,
+time,time,,

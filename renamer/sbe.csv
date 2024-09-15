@@ -3,7 +3,9 @@ PSAL,salinity,,
 t~90C,temperature,degree*C,IPTS-90
 t~90,temperature,degree*C,IPTS-90
 cond~mS/cm,conductivity,mS/cm,
-oxsatMg/L,oxygen,,
+oxsatML/L,oxygen,ml/l,
+oxsatMg/L,oxygen,mg/l,
+oxsatMm/Kg,oxygen,mu*mol/kg,
 density,density,kg/m^3,
 
 
