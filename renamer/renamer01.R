@@ -57,13 +57,26 @@ renamerTest1 <- function(names, dictionary = "sbe.csv", debug = 0) {
 test <- renamerTest1(c("accM", "oxsatMg/L"), "sbe.csv")
 stopifnot(all.equal(test$oceName, c("acceleration", "oxygen")))
 
-d <- read.netcdf("CTD_CAR2023011_001_496780_DN.ODF.nc")
-oldNames <- names(d[["data"]])
-R <- renamerTest1(oldNames, "ioos.csv", debug = 0)
-newNames <- R$oceNames
-df <- data.frame(new = R$oceName, old = R$originalName, check = oldNames)
-stopifnot(all.equal(df$old, df$check))
-print(df[, c("old", "new")])
+for (file in c(
+    "CTD_AT4802_001_1_DN.ODF.nc",
+    "CTD_CAR2023011_001_496780_DN.ODF.nc",
+    "CTD_HL2010001_10_1_DN.ODF.nc",
+    "CTD_NED1996254_003_01_DN.ODF.nc"
+)) {
+    cat("\n**", file, "**\n", sep = "")
+    d <- read.netcdf(file)
+    oldNames <- names(d[["data"]])
+    R <- renamerTest1(oldNames, "ioos.csv", debug = 0)
+    newNames <- R$oceNames
+    df <- data.frame(new = R$oceName, old = R$originalName, check = oldNames)
+    stopifnot(all.equal(df$old, df$check))
+    bad <- which(df$old == df$new &
+        !(df$old %in% c("time", "longitude", "latitude")) &
+        !grepl("^sensor", df$old))
+    for (i in bad) {
+        cat("* [ ] `", df$old[i], "`\n", sep = "")
+    }
+}
 
 message("NEXT: test multiple files, ideally freshly downloaded)")
 message("NEXT: how to align flags with items? (wrt to e.g. salinity2) (also some names wrong)")
