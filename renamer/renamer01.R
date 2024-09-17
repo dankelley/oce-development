@@ -1,4 +1,5 @@
 library(oce)
+showAll <- TRUE
 # NB ctd.sbe.R:39 is wrong; no such function exists (yet)
 # vocab <- read.csv("sbe.csv",
 #    header = FALSE,
@@ -68,13 +69,21 @@ for (file in c(
     oldNames <- names(d[["data"]])
     R <- renamerTest1(oldNames, "ioos.csv", debug = 0)
     newNames <- R$oceNames
-    df <- data.frame(new = R$oceName, old = R$originalName, check = oldNames)
-    stopifnot(all.equal(df$old, df$check))
-    bad <- which(df$old == df$new &
-        !(df$old %in% c("time", "longitude", "latitude")) &
-        !grepl("^sensor", df$old))
-    for (i in bad) {
-        cat("* [ ] `", df$old[i], "`\n", sep = "")
+    df <- data.frame(
+        oceName = R$oceName, originalName = R$originalName, check = oldNames,
+        unit = R$unit, scale = R$scale
+    )
+    stopifnot(all.equal(df$originalName, df$check)) # not really needed once code works
+    bad <- which(df$oceName == df$originalN &
+        !(df$originalName %in% c("time", "longitude", "latitude")) &
+        !grepl("^sensor", df$originalName))
+    if (showAll) {
+        print(knitr::kable(df[, c("originalName", "oceName", "unit", "scale")], "pipe"))
+        cat("\n")
+    } else {
+        for (i in bad) {
+            cat("* [ ] `", df$originalName[i], "`\n", sep = "")
+        }
     }
 }
 
