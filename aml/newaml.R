@@ -34,6 +34,15 @@ read.ctd.aml.testing <- function(file) {
         time <- as.POSIXct(paste(data[["Date"]], data[["Time"]]), tz = "UTC")
         rval <- oceSetData(rval, "time", time, note = "Add time")
     }
+    w <- grep("^Units=", lines)
+    units <- strsplit(gsub("^Units=", "", lines[w]), ",")[[1]]
+    #print(data.frame(name = col.names, units = units))
+    for (i in seq_along(col.names)) {
+        if (!col.names[i] %in% c("Salinity", "Temperature", "Pressure", "Date", "Time", "time")) {
+            #message("DAN name=", col.names[i])
+            rval@metadata$units[[tolower(col.names[i])]] <- units[i]
+        }
+    }
     rval
 }
 
@@ -46,4 +55,3 @@ hist(ctd[["salinity"]])
 badS <- ctd[["salinity"]] < 30 # bad points at end of dataset
 ctdTrimmed <- subset(ctd, !badS)
 plot(ctdTrimmed)
-
