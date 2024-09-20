@@ -9,7 +9,7 @@ showAll <- TRUE
 
 #' Rename variables according to a specified dictionary
 #' The system is that ~ can represent a digit
-renamerTest1 <- function(names, dictionary = "sbe.csv", debug = 0) {
+renamerInternal <- function(names, dictionary = "ioos.csv", debug = 0) {
     debug <- min(3L, max(debug, 0L))
     if (is.character(dictionary) && grepl(".csv$", dictionary)) {
         oceDebug(debug, "renamerTest1() reading dictionary in \"", dictionary, "\"\n", sep = "")
@@ -51,41 +51,54 @@ renamerTest1 <- function(names, dictionary = "sbe.csv", debug = 0) {
         }
     }
     colnames(rval) <- c("originalName", "oceName", "unit", "scale")
+    # rename variables so x,x becomes x,x2 etc, but skip over flags
+    isFlag <- grepl("Flag$", rval$oceName)
+    rval$oceName[!isFlag] <- unduplicateNames(rval$oceName[!isFlag])
     rval
 }
 
-# Test 1
-test <- renamerTest1(c("accM", "oxsatMg/L"), "sbe.csv")
-stopifnot(all.equal(test$oceName, c("acceleration", "oxygen")))
-
-for (file in c(
-    "CTD_AT4802_001_1_DN.ODF.nc",
-    "CTD_CAR2023011_001_496780_DN.ODF.nc",
-    "CTD_HL2010001_10_1_DN.ODF.nc",
-    "CTD_NED1996254_003_01_DN.ODF.nc"
-)) {
-    cat("\n**", file, "**\n", sep = "")
-    d <- read.netcdf(file)
-    oldNames <- names(d[["data"]])
-    R <- renamerTest1(oldNames, "ioos.csv", debug = 0)
-    newNames <- R$oceNames
-    df <- data.frame(
-        oceName = R$oceName, originalName = R$originalName, check = oldNames,
-        unit = R$unit, scale = R$scale
-    )
-    stopifnot(all.equal(df$originalName, df$check)) # not really needed once code works
-    bad <- which(df$oceName == df$originalN &
-        !(df$originalName %in% c("time", "longitude", "latitude")) &
-        !grepl("^sensor", df$originalName))
-    if (showAll) {
-        print(knitr::kable(df[, c("originalName", "oceName", "unit", "scale")], "pipe"))
-        cat("\n")
+renamer2 <- function(o, dictionary = "ioos.csv", debug = 0) {
+    if (!inherits(o, "oce")) stop("o is not an oce-class object")
+    rval <- o
+    originalNames <- names(o[["data"]])
+    R <- renamerInternal(originalNames, dictionary = dictionary, debug = debug)
+    names(rval@metadata$dataNamesOriginal) <- R$oceName
+    names(rval@data) <- R$oceName
+    if (!"units" %in% names(o@metadata)) {
+        warning("FIXME -- set up units from dictionary")
+        units <- list()
     } else {
-        for (i in bad) {
-            cat("* [ ] `", df$originalName[i], "`\n", sep = "")
+        warning("FIXME -- rename units")
+    }
+    warning("FIXME -- handle repeated names")
+    if (!"flags" %in% names(o@metadata)) {
+        warning("FIXME -- set up flags")
+    }
+    # Move calibrations to metadata
+    dataNames <- names(rval@data)
+    for (name in dataNames) {
+        item <- rval@data[[name]]
+        if (is.character(item) && 1L == length(item)) {
+            rval@metadata[[name]] <- item
+            rval@data[[name]] <- NULL
         }
     }
+    # Move flags to metadata
+    dataNames <- names(rval@data)
+    if (is.null(rval@metadata$flags)) {
+        rval@metadata$flags <- list()
+    }
+    for (name in dataNames) {
+        item <- rval@data[[name]]
+        if (grepl("Flag$", name)) {
+            rval@metadata$flags[[name]] <- item
+            rval@data[[name]] <- NULL
+        }
+    }
+    rval
 }
 
-message("NEXT: test multiple files, ideally freshly downloaded)")
-message("NEXT: how to align flags with items? (wrt to e.g. salinity2) (also some names wrong)")
+file <- "CTD_AT4802_001_1_DN.ODF.nc"
+d <- read.netcdf(file)
+d2 <- renamer2(d)
+summary(d2)

@@ -1,0 +1,29 @@
+CTD Summary
+-----------
+
+* Mean Location:       43.818N 15.247E
+* Time: 2024-09-04 11:02:36.01 to 2024-09-04 11:04:38.01 (245 samples, mean increment 0.5 s)
+* Data Overview
+
+                             Min.                   Mean                   Max.                   Dim. NAs
+    scan                     1                      123                    245                    245  0  
+    salinity [PSS-78]        10.111                 38.03231               38.578                 245  0  
+    temperature [°C, ITS-90] 19.178                 23.15864               25.865                 245  0  
+    pressure [dbar]          -0.18                  9.25849                18.27                  245  0  
+    conductivity             17.364                 55.04721               58.117                 245  0  
+    battery                  8.07                   8.084082               8.1                    245  0  
+    density                  1004.5                 1026.207               1027.787               245  0  
+    svcalculated             1509                   1533.11                1539.73                245  0  
+    depth                    -0.18                  9.183878               18.12                  245  0  
+    time                     2024-09-04 11:02:36.01 2024-09-04 11:03:37.01 2024-09-04 11:04:38.01 245  0  
+
+* Processing Log
+
+    - 2024-09-20 11:58:33.336 UTC: `create 'ctd' object`
+    - 2024-09-20 11:58:33.336 UTC: `as.ctd(salinity = data$Salinity, temperature = data$Temperature,     pressure = data$Pressure, longitude = longitude, latitude = latitude)`
+    - 2024-09-20 11:58:33.337 UTC: `Add conductivity`
+    - 2024-09-20 11:58:33.337 UTC: `Add battery`
+    - 2024-09-20 11:58:33.337 UTC: `Add density`
+    - 2024-09-20 11:58:33.337 UTC: `Add svcalculated`
+    - 2024-09-20 11:58:33.337 UTC: `Add depth`
+    - 2024-09-20 11:58:33.347 UTC: `Add time`

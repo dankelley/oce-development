@@ -1,3 +1,7 @@
-renamer01.out:
-	Rscript renamer01.R > CTD_CAR2023011_001_496780_DN.ODF.out
-	cat CTD_CAR2023011_001_496780_DN.ODF.out
+all: $(patsubst %.R,%.out,$(wildcard *.R))
+%.out: %.R
+	R --no-save < $< &> $@
+clean:
+	-rm *~ *png *.out *pdf
+view:
+	open *.png

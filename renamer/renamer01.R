@@ -51,6 +51,9 @@ renamerTest1 <- function(names, dictionary = "sbe.csv", debug = 0) {
         }
     }
     colnames(rval) <- c("originalName", "oceName", "unit", "scale")
+    # rename variables so x,x becomes x,x2 etc, but skip over flags
+    isFlag <- grepl("Flag$", rval$oceName)
+    rval$oceName[!isFlag] <- unduplicateNames(rval$oceName[!isFlag])
     rval
 }
 
