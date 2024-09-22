@@ -6,10 +6,10 @@ library(oce)
 # )
 
 
-renamerInternal <- function(names, dictionary = "ioos.csv", debug = 0) {
+renameInternal <- function(names, dictionary = "ioos.csv", debug = 0) {
     debug <- min(3L, max(debug, 0L))
-    if (is.character(dictionary) && grepl(".csv$", dictionary)) {
-        oceDebug(debug, "renamerTest1() reading dictionary in \"", dictionary, "\"\n", sep = "")
+    if (is.character(dictionary) && grepl(".csv(.gz){0,1}$", dictionary)) {
+        oceDebug(debug, "renamerInternal() reading dictionary in \"", dictionary, "\"\n", sep = "")
         vocab <- read.csv(dictionary,
             header = FALSE,
             col.names = c("original", "oce", "unit", "scale")
@@ -72,7 +72,7 @@ rename <- function(x, dictionary = "ioos.csv", debug = 0) {
     if (!inherits(x, "oce")) stop("x is not an oce-class object")
     rval <- x
     originalNames <- names(x[["data"]])
-    R <- renamerInternal(originalNames, dictionary = dictionary, debug = debug)
+    R <- renameInternal(originalNames, dictionary = dictionary, debug = debug)
     # set up original names
     names(rval@metadata$dataNamesOriginal) <- R$oceName
     # rename data
@@ -107,8 +107,3 @@ rename <- function(x, dictionary = "ioos.csv", debug = 0) {
     rval@processingLog <- processingLogAppend(rval@processingLog, paste(deparse(match.call()), sep = "", collapse = ""))
     rval
 }
-
-file <- "CTD_AT4802_001_1_DN.ODF.nc"
-d <- read.netcdf(file)
-d2 <- rename(d, dictionary = "ioos.csv")
-summary(d2)
