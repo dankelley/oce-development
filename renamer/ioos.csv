@@ -1,5 +1,5 @@
 # https://cfconventions.org/Data/cf-standard-names/78/build/cf-standard-name-table.html
-AHSFZZ~~,hab,m,
+AHSFZZ~~,HAB,m,
 ATTNZS~~,lightAttenuation,1/m,
 AltimeterSensor,altimeterCalibration,,
 CDOMZZ~~,CDOM,mg/m^3,
@@ -27,7 +27,7 @@ PRESPR~~,pressure,dbar,
 PSALST~~,salinity,,PSS-78
 PSLTZZ~~,salinity,,PSS-78
 PressureSensor,pressureCalibration,,
-QALTB_~~,habFlag,,
+QALTB_~~,HABFlag,,
 QATBE_~~,lightAttenuationFlag,,
 QCDOMZZ~~,CDOMFlag,,
 QCFF_~~,quality,,

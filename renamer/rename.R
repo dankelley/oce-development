@@ -1,5 +1,4 @@
 library(oce)
-showAll <- TRUE
 # NB ctd.sbe.R:39 is wrong; no such function exists (yet)
 # vocab <- read.csv("sbe.csv",
 #    header = FALSE,
@@ -7,8 +6,6 @@ showAll <- TRUE
 # )
 
 
-#' Rename variables according to a specified dictionary
-#' The system is that ~ can represent a digit
 renamerInternal <- function(names, dictionary = "ioos.csv", debug = 0) {
     debug <- min(3L, max(debug, 0L))
     if (is.character(dictionary) && grepl(".csv$", dictionary)) {
@@ -57,22 +54,34 @@ renamerInternal <- function(names, dictionary = "ioos.csv", debug = 0) {
     rval
 }
 
-renamer2 <- function(o, dictionary = "ioos.csv", debug = 0) {
-    if (!inherits(o, "oce")) stop("o is not an oce-class object")
-    rval <- o
-    originalNames <- names(o[["data"]])
+#' Rename variables according to a specified dictionary
+#'
+#' The is a provisional function, added in September 2024,
+#' and likely to change through the end of that year.
+#'
+#' FIXME: explain columns and that ~ can represent any digit
+#'
+#' @examples
+#' file <- "CTD_AT4802_001_1_DN.ODF.nc"
+#' d <- read.netcdf(file)
+#' d2 <- rename(d, dictionary = "ioos.csv")
+#' summary(d2)
+#'
+#' @author Dan Kelley
+rename <- function(x, dictionary = "ioos.csv", debug = 0) {
+    if (!inherits(x, "oce")) stop("x is not an oce-class object")
+    rval <- x
+    originalNames <- names(x[["data"]])
     R <- renamerInternal(originalNames, dictionary = dictionary, debug = debug)
+    # set up original names
     names(rval@metadata$dataNamesOriginal) <- R$oceName
+    # rename data
     names(rval@data) <- R$oceName
-    if (!"units" %in% names(o@metadata)) {
-        warning("FIXME -- set up units from dictionary")
-        units <- list()
+    # rename units
+    if (!"units" %in% names(x@metadata)) {
+        rval@metadata$units <- list()
     } else {
-        warning("FIXME -- rename units")
-    }
-    warning("FIXME -- handle repeated names")
-    if (!"flags" %in% names(o@metadata)) {
-        warning("FIXME -- set up flags")
+        names(rval@metadata$units) <- sapply(names(rval@metadata$units), \(n) R$oceName[which(n == R$originalName)])
     }
     # Move calibrations to metadata
     dataNames <- names(rval@data)
@@ -95,10 +104,11 @@ renamer2 <- function(o, dictionary = "ioos.csv", debug = 0) {
             rval@data[[name]] <- NULL
         }
     }
+    rval@processingLog <- processingLogAppend(rval@processingLog, paste(deparse(match.call()), sep = "", collapse = ""))
     rval
 }
 
 file <- "CTD_AT4802_001_1_DN.ODF.nc"
 d <- read.netcdf(file)
-d2 <- renamer2(d)
+d2 <- rename(d, dictionary = "ioos.csv")
 summary(d2)
